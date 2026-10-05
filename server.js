@@ -32,7 +32,7 @@ const RAW = `
 16 40230 M Ratikorn Jindamath
 17 40232 F Nichapa Aksornvanich
 18 40298 M Nititorn Chaisri
-19 40316 F Punnachat Sompawongำ
+19 40316 F Punnachat Sompawong
 20 
 21 40334 M Pat Wisadsing
 22 
