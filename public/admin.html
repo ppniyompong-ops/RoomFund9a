@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · Class Fund 3/A</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',system-ui,sans-serif}</style>
+<style id="dark-theme">
+html.dark{color-scheme:dark}
+.dark body{background:#0b1220;color:#e2e8f0}
+.dark .bg-white{background:#1e293b}
+.dark .bg-slate-50,.dark .bg-stone-50{background:#0b1220}
+.dark li.bg-slate-50{background:#162033}
+.dark .bg-slate-100,.dark .bg-stone-100{background:#273449}
+.dark .hover\:bg-slate-200:hover{background:#334155}
+.dark .bg-slate-800{background:#334155}
+.dark .hover\:bg-slate-900:hover{background:#475569}
+.dark .text-slate-800,.dark .text-slate-700{color:#e2e8f0}
+.dark .text-slate-600{color:#cbd5e1}
+.dark .text-slate-500,.dark .text-slate-400{color:#94a3b8}
+.dark .border-slate-200,.dark .border-slate-300,.dark .border-stone-200,.dark .border-stone-300{border-color:#334155}
+.dark .border-stone-100,.dark .border-slate-100{border-color:#273449}
+.dark input,.dark select{background:#0f172a;color:#e2e8f0}
+.dark ::placeholder{color:#64748b}
+.dark .bg-red-50\/60{background:rgba(239,68,68,.12)}
+.dark .bg-red-100{background:rgba(239,68,68,.22)}
+.dark .text-red-600,.dark .text-red-700{color:#fca5a5}
+.dark .border-red-200,.dark .border-red-300{border-color:rgba(239,68,68,.45)}
+.dark .bg-amber-50{background:rgba(245,158,11,.12)}
+.dark .bg-amber-100{background:rgba(245,158,11,.22)}
+.dark .text-amber-900,.dark .text-amber-800,.dark .text-amber-700{color:#fcd34d}
+.dark .border-amber-200{border-color:rgba(245,158,11,.45)}
+.dark .bg-emerald-50,.dark .bg-emerald-50\/60{background:rgba(16,185,129,.12)}
+.dark .bg-emerald-100{background:rgba(16,185,129,.22)}
+.dark .text-emerald-900,.dark .text-emerald-800,.dark .text-emerald-700{color:#6ee7b7}
+.dark .border-emerald-200{border-color:rgba(16,185,129,.45)}
+</style>
+<script>try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
+</head>
+<body class="bg-stone-50 text-slate-800 min-h-screen">
+<header class="bg-slate-800 text-white">
+  <div class="max-w-5xl mx-auto px-5 py-5 flex items-center justify-between gap-3 flex-wrap">
+    <div><h1 class="text-xl font-bold">Class Fund Dashboard · Grade 3/A</h1><p id="who" class="text-slate-300 text-sm"></p></div>
+    <div class="flex gap-4 text-sm">
+      <a href="/" class="underline text-slate-300">Student Page</a>
+      <button id="pwOpen" class="hidden underline text-slate-300">Change Password</button>
+      <button id="logout" class="hidden underline text-slate-300">Log out</button>
+    </div>
+  </div>
+</header>
+<main class="max-w-5xl mx-auto px-5 py-6">
+  <section id="loginView" class="bg-white rounded-xl border border-stone-200 p-5 max-w-sm mx-auto">
+    <h2 class="font-bold text-lg mb-4">Admin / Master Login</h2>
+    <input id="user" placeholder="Username, e.g. Admin001" class="w-full border border-stone-300 rounded-lg px-4 py-3 mb-3" autocapitalize="off">
+    <input id="pass" type="password" placeholder="Password" class="w-full border border-stone-300 rounded-lg px-4 py-3">
+    <p id="loginErr" class="text-red-600 text-sm mt-2 hidden"></p>
+    <button id="loginBtn" class="w-full mt-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg py-3">Log in</button>
+  </section>
+
+  <section id="dash" class="hidden">
+    <div id="cards" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
+    <h2 class="font-bold text-lg mb-2">Pending Review <span id="pCount" class="text-amber-700"></span></h2>
+    <p id="roNote" class="hidden text-sm text-slate-500 mb-2">Master accounts are read-only and cannot approve or reject payments.</p>
+    <ul id="pending" class="space-y-2 mb-8"></ul>
+
+    <h2 class="font-bold text-lg mb-1">Record Income</h2>
+    <p class="text-xs text-slate-500 mb-2">For money received besides the monthly fee (donations, event sales, leftover cash). Student payments are counted automatically.</p>
+    <div id="inBox" class="hidden bg-white rounded-xl border border-stone-200 p-4 mb-3">
+      <div class="grid sm:grid-cols-6 gap-2">
+        <input id="inAmount" type="number" min="1" step="any" inputmode="decimal" placeholder="Amount (THB)" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-1">
+        <input id="inDate" type="date" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-1" title="Income Date">
+        <input id="inSource" maxlength="200" placeholder="Source, e.g. Donation from parents" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-3">
+        <button id="inBtn" class="bg-emerald-700 text-white rounded-lg px-5 py-2 font-medium sm:col-span-1">Add Income</button>
+      </div>
+      <p id="inErr" class="text-red-600 text-sm mt-2 hidden"></p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 overflow-x-auto mb-8">
+      <table class="w-full text-sm"><thead id="inHead" class="bg-stone-100 text-left"></thead><tbody id="inBody"></tbody></table>
+    </div>
+
+    <h2 class="font-bold text-lg mb-2">Withdraw Funds</h2>
+    <div id="wdBox" class="hidden bg-white rounded-xl border border-stone-200 p-4 mb-3">
+      <div class="grid sm:grid-cols-6 gap-2">
+        <input id="wdAmount" type="number" min="1" step="any" inputmode="decimal" placeholder="Amount (THB)" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-1">
+        <input id="wdDate" type="date" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-1" title="Withdrawal Date">
+        <input id="wdReason" maxlength="200" placeholder="Withdrawal reason, e.g. Buy A4 paper" class="border border-stone-300 rounded-lg px-3 py-2 sm:col-span-3">
+        <button id="wdBtn" class="bg-slate-800 text-white rounded-lg px-5 py-2 font-medium sm:col-span-1">Withdraw</button>
+      </div>
+      <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500"><span>Attach receipt (optional)</span><input id="wdFile" type="file" accept="image/png,image/jpeg,image/webp"></div>
+      <p id="wdErr" class="text-red-600 text-sm mt-2 hidden"></p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 overflow-x-auto mb-8">
+      <table class="w-full text-sm"><thead id="wdHead" class="bg-stone-100 text-left"></thead><tbody id="wdBody"></tbody></table>
+    </div>
+
+    <div class="flex items-center justify-between mb-2 gap-3">
+      <h2 class="font-bold text-lg">All Student Statuses</h2>
+      <input id="search" placeholder="Search name / number / ID" class="border border-stone-300 rounded-lg px-3 py-2 text-sm w-56">
+    </div>
+    <p id="bulkMsg" class="hidden text-sm text-emerald-700 mb-2"></p>
+    <div id="bulkBar" class="hidden bg-white border border-stone-200 rounded-xl p-3 mb-3 flex flex-wrap items-center gap-2">
+      <span id="bulkCount" class="text-sm font-medium mr-1"></span>
+      <select id="bulkMonth" class="border border-stone-300 rounded-lg px-3 py-2 text-sm"></select>
+      <button data-st="approved" class="bulk px-3 py-2 rounded-lg bg-emerald-700 text-white text-sm font-medium">Set as Paid</button>
+      <button data-st="unpaid" class="bulk px-3 py-2 rounded-lg border border-red-300 text-red-700 text-sm">Set as Outstanding</button>
+      <button data-st="none" class="bulk px-3 py-2 rounded-lg border border-slate-300 text-slate-600 text-sm">Set as -</button>
+      <button id="bulkClear" class="text-sm underline text-slate-500 ml-auto">Clear Selection</button>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 overflow-x-auto">
+      <table class="w-full text-sm"><thead id="thead" class="bg-stone-100 text-left"></thead><tbody id="tbody"></tbody></table>
+    </div>
+    <h2 class="font-bold text-lg mt-8 mb-2">Activity Log</h2>
+    <div class="bg-white rounded-xl border border-stone-200 overflow-auto max-h-96">
+      <table class="w-full text-sm"><thead class="bg-stone-100 text-left sticky top-0"><tr><th class="p-3">Time</th><th class="p-3">By</th><th class="p-3">Action</th><th class="p-3">Details</th></tr></thead><tbody id="auditBody"></tbody></table>
+    </div>
+    <div id="backupBox" class="hidden bg-white rounded-xl border border-stone-200 p-4 mt-8">
+      <h2 class="font-bold text-lg mb-1">Backup</h2>
+      <p id="storageNote" class="text-sm mb-3"></p>
+      <div class="flex flex-wrap gap-2">
+        <button id="bkDown" class="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium">Download Backup</button>
+        <button id="bkUp" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 text-sm">Imported backup</button>
+        <input id="bkFile" type="file" accept="application/json,.json" class="hidden">
+      </div>
+      <p id="bkMsg" class="hidden text-sm text-slate-600 mt-3"></p>
+    </div>
+    <p class="text-xs text-slate-500 mt-2">Months before the 1st are automatically "-" and become outstanding on the 1st.</p>
+  </section>
+</main>
+
+<!-- review / status modal -->
+<div id="modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-10">
+  <div class="bg-white rounded-2xl w-full max-w-md p-5 max-h-[92vh] overflow-y-auto">
+    <h3 id="mTitle" class="font-bold"></h3><p id="mSub" class="text-sm text-slate-500 mb-3"></p>
+    <div id="mBody" class="mb-4 text-center"></div>
+    <p id="mErr" class="text-red-600 text-sm mb-2 hidden"></p>
+    <div id="mActions" class="flex flex-wrap gap-2"></div>
+    <button id="mClose" class="w-full mt-2 py-2 text-sm text-slate-500">Close</button>
+  </div>
+</div>
+
+<!-- edit withdrawal modal -->
+<!-- edit income modal -->
+<div id="inModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-10">
+  <div class="bg-white rounded-2xl w-full max-w-md p-5">
+    <h3 class="font-bold mb-3">Edit income</h3>
+    <label class="text-sm text-slate-500">Amount (THB)</label>
+    <input id="eiAmount" type="number" min="1" step="any" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <label class="text-sm text-slate-500">Income Date</label>
+    <input id="eiDate" type="date" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <label class="text-sm text-slate-500">Source</label>
+    <input id="eiSource" maxlength="200" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <p id="eiErr" class="text-red-600 text-sm mb-2 hidden"></p>
+    <div class="flex gap-2">
+      <button id="eiDelete" class="flex-1 py-3 rounded-lg border border-red-300 text-red-700">Delete</button>
+      <button id="eiSave" class="flex-[2] py-3 rounded-lg bg-slate-800 text-white font-bold">Save</button>
+    </div>
+    <button id="eiClose" class="w-full mt-2 py-2 text-sm text-slate-500">Close</button>
+  </div>
+</div>
+
+<div id="wdModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-10">
+  <div class="bg-white rounded-2xl w-full max-w-md p-5">
+    <h3 class="font-bold mb-3">Edited withdrawal</h3>
+    <label class="text-sm text-slate-500">Amount (THB)</label>
+    <input id="ewAmount" type="number" min="1" step="any" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <label class="text-sm text-slate-500">Withdrawal Date</label>
+    <input id="ewDate" type="date" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <label class="text-sm text-slate-500">Reason</label>
+    <input id="ewReason" maxlength="200" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <label class="text-sm text-slate-500">Receipt (choose a new file to replace)</label>
+    <input id="ewFile" type="file" accept="image/png,image/jpeg,image/webp" class="w-full text-sm mb-1">
+    <label id="ewRmBox" class="hidden text-sm text-slate-500 flex items-center gap-2 mb-3"><input id="ewRm" type="checkbox"> Remove existing receipt</label>
+    <p id="ewErr" class="text-red-600 text-sm mb-2 hidden"></p>
+    <div class="flex gap-2">
+      <button id="ewDelete" class="flex-1 py-3 rounded-lg border border-red-300 text-red-700">Delete Withdrawal</button>
+      <button id="ewSave" class="flex-[2] py-3 rounded-lg bg-slate-800 text-white font-bold">Save</button>
+    </div>
+    <button id="ewClose" class="w-full mt-2 py-2 text-sm text-slate-500">Close</button>
+  </div>
+</div>
+
+<!-- change password modal -->
+<div id="pwModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-10">
+  <div class="bg-white rounded-2xl w-full max-w-sm p-5">
+    <h3 class="font-bold mb-3">Change Password</h3>
+    <div id="pwWho" class="hidden mb-3">
+      <label class="text-sm text-slate-500">Account</label>
+      <select id="pwUser" class="w-full border border-stone-300 rounded-lg px-3 py-2"></select>
+    </div>
+    <input id="pwOld" type="password" placeholder="Current Password" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <input id="pwNew" type="password" placeholder="New password (6+ characters)" class="w-full border border-stone-300 rounded-lg px-3 py-2 mb-3">
+    <input id="pwNew2" type="password" placeholder="Confirm new password" class="w-full border border-stone-300 rounded-lg px-3 py-2">
+    <p id="pwErr" class="text-red-600 text-sm mt-2 hidden"></p>
+    <p id="pwOk" class="text-emerald-700 text-sm mt-2 hidden">Password changed successfully</p>
+    <div class="flex gap-2 mt-4">
+      <button id="pwClose" class="flex-1 py-3 rounded-lg border border-stone-300 text-slate-600">Close</button>
+      <button id="pwSave" class="flex-[2] py-3 rounded-lg bg-slate-800 text-white font-bold">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const TH = { '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec' };
+const label = (m) => `${TH[m.slice(5)]} ${+m.slice(0, 4) + 543}`;
+const compress = (file) => new Promise((ok, bad) => {
+  const img = new Image(), url = URL.createObjectURL(file);
+  img.onload = () => {
+    const k = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+    c.width = img.width * k; c.height = img.height * k; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', 0.8));
+  };
+  img.onerror = () => bad(new Error('Unable to read image file'));
+  img.src = url;
+});
+const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+const ST = { unpaid: ['Outstanding', 'bg-red-100 text-red-700'], pending: ['Pending', 'bg-amber-100 text-amber-800'], approved: ['Paid', 'bg-emerald-100 text-emerald-800'], none: ['-', 'bg-slate-100 text-slate-500'] };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const show = (id, t) => { $(id).textContent = t; $(id).classList.remove('hidden'); };
+const hide = (...ids) => ids.forEach((i) => $(i).classList.add('hidden'));
+let token = null, data = null, isAdmin = false, editingId = null;
+const selected = new Set();
+try { token = sessionStorage.getItem('tk'); } catch (e) {}
+
+async function api(url, method, body) {
+  const r = await fetch(url, { method: method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: body && JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && token) logout();
+  if (!r.ok) throw new Error(j.error || 'An error occurred');
+  return j;
+}
+function logout() { try { sessionStorage.removeItem('tk'); } catch (e) {} location.reload(); }
+
+async function login() {
+  hide('loginErr');
+  try {
+    const r = await fetch('/api/staff/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: $('user').value.trim(), password: $('pass').value }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error);
+    token = j.token; try { sessionStorage.setItem('tk', token); } catch (e) {}
+    await refresh();
+  } catch (e) { show('loginErr', e.message); }
+}
+
+async function refresh() {
+  data = await api('/api/staff/overview');
+  isAdmin = data.user.role === 'admin';
+  hide('loginView'); $('dash').classList.remove('hidden'); $('logout').classList.remove('hidden'); $('pwOpen').classList.remove('hidden');
+  $('who').textContent = `${data.user.name} · ${isAdmin ? 'Admin' : 'Master (read-only)'}`;
+  $('roNote').classList.toggle('hidden', isAdmin);
+  $('wdBox').classList.toggle('hidden', !isAdmin);
+  $('inBox').classList.toggle('hidden', !isAdmin);
+  if (!$('inDate').value) $('inDate').value = data.today;
+  $('inDate').max = data.today;
+  $('backupBox').classList.toggle('hidden', !isAdmin);
+  $('storageNote').textContent = data.storage === 'database' ? 'Current storage: database (data persists across server restarts)' : 'Current storage: server file (may be lost after a restart on free hosting). Download backups regularly.';
+  if (!$('wdDate').value) $('wdDate').value = data.today;
+  $('wdDate').max = data.today;
+
+  const s = data.stats, n = (v) => v.toLocaleString();
+  const card = (t, v, c) => `<div class="bg-white rounded-xl border border-stone-200 p-4"><p class="text-sm text-slate-500">${t}</p><p class="text-2xl font-bold ${c}">${v}</p></div>`;
+  $('cards').innerHTML = card('Collected (THB)', n(s.collected), 'text-emerald-700') + card('Other Income (THB)', n(s.otherIncome), 'text-emerald-700') + card('Withdrawn (THB)', n(s.withdrawn), 'text-slate-700')
+    + card('Room Fund Balance (THB)', n(s.balance), 'text-emerald-700') + card('Pending Review (THB)', n(s.pendingAmount), 'text-amber-700')
+    + card('Unpaid (THB)', n(s.unpaidAmount), 'text-red-600') + card('Total Due (THB)', n(s.expected), '');
+
+  $('pCount').textContent = data.pending.length ? `(${data.pending.length})` : '';
+  $('pending').innerHTML = data.pending.length ? data.pending.map((p, i) => `<li class="bg-white rounded-xl border border-stone-200 p-3 flex items-center justify-between gap-3">
+    <div><p class="font-medium">No. ${p.number} ${esc(p.name)}</p><p class="text-sm text-slate-500">${label(p.month)} · ${p.type === 'slip' ? 'Bank Transfer (Slip)' : 'Cash'}</p>${p.dupNote ? `<p class="text-sm text-amber-700">⚠ ${esc(p.dupNote)}</p>` : ''}</div>
+    <button data-i="${i}" class="view shrink-0 bg-slate-800 text-white rounded-lg px-4 py-2 text-sm">${isAdmin ? 'Review' : 'View Details'}</button></li>`).join('')
+    : '<li class="text-slate-500 text-sm bg-white rounded-xl border border-stone-200 p-4">No pending items</li>';
+
+  $('wdHead').innerHTML = `<tr><th class="p-3">Withdrawal Date</th><th class="p-3">Amount (THB)</th><th class="p-3">Reason</th><th class="p-3">Recorded By</th><th class="p-3">Receipt</th>${isAdmin ? '<th class="p-3"></th>' : ''}</tr>`;
+  $('wdBody').innerHTML = data.withdrawals.length ? data.withdrawals.map((w, i) => `<tr class="border-t border-stone-100">
+    <td class="p-3 whitespace-nowrap">${fmtDate(w.date)}</td><td class="p-3 font-medium">${w.amount.toLocaleString()}</td><td class="p-3">${esc(w.reason)}</td>
+    <td class="p-3 whitespace-nowrap">${esc(w.by)}${w.editedAt ? ' <span class="text-xs text-slate-400">(edited)</span>' : ''}</td>
+    <td class="p-3">${w.hasReceipt ? `<button class="rc underline text-sm" data-id="${w.id}">View</button>` : '-'}</td>
+    ${isAdmin ? `<td class="p-3"><button class="ew underline text-sm" data-i="${i}">Edit</button></td>` : ''}</tr>`).join('')
+    : `<tr><td colspan="6" class="p-4 text-slate-500">No withdrawals yet</td></tr>`;
+
+  $('inHead').innerHTML = `<tr><th class="p-3">Income Date</th><th class="p-3">Amount (THB)</th><th class="p-3">Source</th><th class="p-3">Recorded By</th>${isAdmin ? '<th class="p-3"></th>' : ''}</tr>`;
+  $('inBody').innerHTML = data.incomes.length ? data.incomes.map((x, k) => `<tr class="border-t border-stone-100">
+    <td class="p-3 whitespace-nowrap">${fmtDate(x.date)}</td><td class="p-3 font-medium">${x.amount.toLocaleString()}</td><td class="p-3">${esc(x.source)}</td>
+    <td class="p-3 whitespace-nowrap">${esc(x.by)}${x.editedAt ? ' <span class="text-xs text-slate-400">(edited)</span>' : ''}</td>
+    ${isAdmin ? `<td class="p-3"><button class="ei underline text-sm" data-i="${k}">Edit</button></td>` : ''}</tr>`).join('')
+    : `<tr><td colspan="5" class="p-4 text-slate-500">No other income yet</td></tr>`;
+
+  $('auditBody').innerHTML = (data.audit || []).length ? data.audit.map((a) => `<tr class="border-t border-stone-100"><td class="p-3 whitespace-nowrap">${new Date(a.at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}</td><td class="p-3 whitespace-nowrap">${esc(a.by)}</td><td class="p-3 whitespace-nowrap">${esc(a.action)}</td><td class="p-3">${esc(a.detail)}</td></tr>`).join('')
+    : '<tr><td colspan="4" class="p-4 text-slate-500">No history</td></tr>';
+  $('bulkMonth').innerHTML = '<option value="all">All months</option>' + data.months.map((m) => `<option value="${m}">${label(m)}</option>`).join('');
+  $('thead').innerHTML = `<tr>${isAdmin ? '<th class="p-3"><input type="checkbox" id="selAll" title="Select all"></th>' : ''}<th class="p-3">No.</th><th class="p-3">ID</th><th class="p-3">Name</th>${isAdmin ? '<th class="p-3">PIN</th>' : ''}${data.months.map((m) => `<th class="p-3">${label(m)}</th>`).join('')}</tr>`;
+  renderRows();
+}
+
+function filtered() {
+  const q = $('search').value.trim();
+  return data.students.filter((s) => !q || `${s.number} ${s.studentId} ${s.name}`.includes(q));
+}
+function updateBulk() {
+  $('bulkBar').classList.toggle('hidden', !isAdmin || !selected.size);
+  $('bulkCount').textContent = `${selected.size} selected`;
+  const all = $('selAll'), f = filtered();
+  if (all) all.checked = f.length > 0 && f.every((s) => selected.has(s.id));
+}
+function renderRows() {
+  $('tbody').innerHTML = filtered().map((s) =>
+    `<tr class="border-t border-stone-100">${isAdmin ? `<td class="p-3"><input type="checkbox" class="sel" value="${s.id}" ${selected.has(s.id) ? 'checked' : ''}></td>` : ''}<td class="p-3">${s.number}</td><td class="p-3">${s.studentId}</td><td class="p-3 whitespace-nowrap">${esc(s.name)}</td>${isAdmin ? `<td class="p-3"><button class="pin underline tabular-nums" data-s="${s.id}" title="Edit PIN">${esc(s.pin)}</button></td>` : ''}` +
+    s.months.map((m) => {
+      const b = `<span class="px-2 py-1 rounded-full text-xs ${ST[m.status][1]}">${ST[m.status][0]}</span>`;
+      return `<td class="p-3">${isAdmin ? `<button class="st" data-s="${s.id}" data-m="${m.month}" title="Change status">${b}</button>` : b}</td>`;
+    }).join('') + '</tr>').join('');
+  updateBulk();
+}
+async function bulkApply(status) {
+  const ids = [...selected], mv = $('bulkMonth').value, months = mv === 'all' ? data.months : [mv];
+  const what = { approved: 'Paid', unpaid: 'Outstanding', none: '- (No payment required)' }[status];
+  if (!confirm(`Set status to "${what}" for ${ids.length} student(s) (${mv === 'all' ? 'All months' : label(mv)})?`)) return;
+  hide('bulkMsg');
+  try {
+    const r = await api('/api/admin/bulk-status', 'POST', { studentIds: ids, months, status });
+    selected.clear(); await refresh();
+    show('bulkMsg', `Updated ${r.updated} item(s)` + (r.same ? ` · Skipped ${r.same} (status already set)` : '') + (r.blocked ? ` · Blocked ${r.blocked} (month not due or insufficient balance)` : ''));
+  } catch (e) { alert(e.message); }
+}
+
+// ---- review slip / cash
+async function openReview(p) {
+  $('mTitle').textContent = `No. ${p.number} ${p.name}`; $('mSub').textContent = `${label(p.month)} · 50 THB`;
+  $('mBody').innerHTML = '<p class="text-slate-500">Loading...</p>'; $('mActions').innerHTML = ''; hide('mErr');
+  $('modal').classList.remove('hidden');
+  try {
+    const d = await api(`/api/staff/slip/${p.studentId}/${p.month}`);
+    $('mBody').innerHTML = d.slip ? `<img src="${d.slip}" class="rounded-lg border max-h-[60vh] mx-auto">`
+      : '<p class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm">The student reported a cash payment. Verify that the money was actually received before approving.</p>';
+    if (d.dupNote) $('mBody').insertAdjacentHTML('afterbegin', `<p class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-2 text-sm mb-2">⚠ ${esc(d.dupNote)}</p>`);
+    if (isAdmin) {
+      $('mActions').innerHTML = '<button id="rej" class="flex-1 py-3 rounded-lg border border-red-300 text-red-700">Reject</button><button id="app" class="flex-1 py-3 rounded-lg bg-emerald-700 text-white font-bold">Approve</button>';
+      $('app').onclick = () => verify(p, 'approve');
+      $('rej').onclick = () => { const r = prompt('Rejection reason (optional)', 'Invalid slip'); if (r !== null) verify(p, 'reject', r); };
+    }
+  } catch (e) { $('mBody').textContent = e.message; }
+}
+async function verify(p, action, reason) {
+  try { await api('/api/admin/verify', 'POST', { studentId: p.studentId, month: p.month, action, reason }); hide('modal'); await refresh(); }
+  catch (e) { show('mErr', e.message); }
+}
+
+// ---- change one status
+function openStatus(s, month, status) {
+  $('mTitle').textContent = `No. ${s.number} ${s.name}`;
+  $('mSub').textContent = `${label(month)} · Current status: ${ST[status][0]}`;
+  $('mBody').innerHTML = ''; hide('mErr');
+  const b = (id, t, c) => `<button id="${id}" class="flex-1 min-w-[8rem] py-3 rounded-lg ${c}">${t}</button>`;
+  $('mActions').innerHTML = (status !== 'approved' ? b('toPaid', 'Set as Paid', 'bg-emerald-700 text-white font-bold') : '')
+    + (status !== 'unpaid' ? b('toUnpaid', 'Set as Unpaid', 'border border-red-300 text-red-700') : '')
+    + (status !== 'none' ? b('toNone', 'Set as - (No payment required)', 'border border-slate-300 text-slate-600') : '');
+  if ($('toPaid')) $('toPaid').onclick = () => setStatus(s, month, 'approved');
+  if ($('toUnpaid')) $('toUnpaid').onclick = () => setStatus(s, month, 'unpaid');
+  if ($('toNone')) $('toNone').onclick = () => setStatus(s, month, 'none');
+  $('modal').classList.remove('hidden');
+}
+async function setStatus(s, month, status) {
+  try { await api('/api/admin/set-status', 'POST', { studentId: s.id, month, status }); hide('modal'); await refresh(); }
+  catch (e) { show('mErr', e.message); }
+}
+
+// ---- withdrawals
+function openWd(w) {
+  editingId = w.id; $('ewAmount').value = w.amount; $('ewDate').value = w.date; $('ewDate').max = data.today; $('ewReason').value = w.reason;
+  $('ewFile').value = ''; $('ewRm').checked = false; $('ewRmBox').classList.toggle('hidden', !w.hasReceipt);
+  hide('ewErr'); $('wdModal').classList.remove('hidden');
+}
+async function viewReceipt(id) {
+  $('mTitle').textContent = 'Withdrawal Receipt'; $('mSub').textContent = ''; $('mActions').innerHTML = ''; hide('mErr');
+  $('mBody').innerHTML = '<p class="text-slate-500">Loading...</p>'; $('modal').classList.remove('hidden');
+  try { const d = await api('/api/receipt/' + id); $('mBody').innerHTML = `<img src="${d.receipt}" class="rounded-lg border max-h-[70vh] mx-auto">`; }
+  catch (e) { $('mBody').textContent = e.message; }
+}
+async function editPin(id) {
+  const s = data.students.find((x) => x.id === id);
+  const v = prompt(`Set a new 4-digit PIN for No. ${s.number} ${s.name}\n(Enter 1234 to reset to the default)`, s.pin);
+  if (v === null) return;
+  try { await api('/api/admin/set-pin', 'POST', { studentId: id, pin: v.trim() }); await refresh(); } catch (e) { alert(e.message); }
+}
+async function saveWd() {
+  hide('ewErr');
+  try {
+    const f = $('ewFile').files[0];
+    await api('/api/admin/withdraw/' + editingId, 'PUT', { amount: $('ewAmount').value, date: $('ewDate').value, reason: $('ewReason').value, receipt: f ? await compress(f) : undefined, removeReceipt: $('ewRm').checked });
+    hide('wdModal'); await refresh();
+  }
+  catch (e) { show('ewErr', e.message); }
+}
+async function delWd() {
+  if (!confirm('Delete this withdrawal? The money will be returned to the room fund.')) return;
+  try { await api('/api/admin/withdraw/' + editingId, 'DELETE'); hide('wdModal'); await refresh(); }
+  catch (e) { show('ewErr', e.message); }
+}
+
+// ---- password
+function openPw() {
+  ['pwOld', 'pwNew', 'pwNew2'].forEach((i) => $(i).value = ''); hide('pwErr', 'pwOk');
+  $('pwWho').classList.toggle('hidden', !isAdmin);
+  if (isAdmin) $('pwUser').innerHTML = '<option value="">My password</option>' + data.accounts.filter((a) => a.username !== data.user.username).map((a) => `<option value="${esc(a.username)}">Set a new password for ${esc(a.name)} (${esc(a.username)})</option>`).join('');
+  pwToggle(); $('pwModal').classList.remove('hidden');
+}
+function pwToggle() { $('pwOld').classList.toggle('hidden', isAdmin && !!$('pwUser').value); }
+async function savePw() {
+  hide('pwErr', 'pwOk');
+  if ($('pwNew').value !== $('pwNew2').value) return show('pwErr', 'The new passwords do not match');
+  const other = isAdmin ? $('pwUser').value : '';
+  try {
+    if (other) await api('/api/admin/set-password', 'POST', { username: other, newPassword: $('pwNew').value });
+    else await api('/api/staff/change-password', 'POST', { oldPassword: $('pwOld').value, newPassword: $('pwNew').value });
+    ['pwOld', 'pwNew', 'pwNew2'].forEach((i) => $(i).value = ''); $('pwOk').classList.remove('hidden');
+  } catch (e) { show('pwErr', e.message); }
+}
+
+// ---- backup
+async function downloadBackup() {
+  hide('bkMsg');
+  try {
+    const r = await fetch('/api/admin/backup', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Download failed');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(await r.blob()); a.download = `roomfund-backup-${data.today}.json`; a.click(); URL.revokeObjectURL(a.href);
+  } catch (e) { show('bkMsg', e.message); }
+}
+async function restoreBackup(file) {
+  hide('bkMsg'); let j;
+  try { j = JSON.parse(await file.text()); } catch (e) { return show('bkMsg', 'The file is not a valid backup'); }
+  if (!confirm('Import backup? Current payment and withdrawal data will be replaced.')) return;
+  try { await api('/api/admin/restore', 'POST', j); await refresh(); show('bkMsg', 'Backup imported successfully'); } catch (e) { show('bkMsg', e.message); }
+}
+
+// ---- events
+$('bkDown').onclick = downloadBackup;
+$('bkUp').onclick = () => $('bkFile').click();
+$('bkFile').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) restoreBackup(f); };
+$('thead').onchange = (e) => {
+  if (e.target.id !== 'selAll') return;
+  filtered().forEach((s) => e.target.checked ? selected.add(s.id) : selected.delete(s.id));
+  renderRows();
+};
+$('tbody').onchange = (e) => {
+  if (!e.target.classList.contains('sel')) return;
+  const id = +e.target.value; e.target.checked ? selected.add(id) : selected.delete(id); updateBulk();
+};
+$('tbody').onclick = (e) => {
+  const pb = e.target.closest('.pin'); if (pb) return editPin(+pb.dataset.s);
+  const b = e.target.closest('.st'); if (!b) return;
+  const s = data.students.find((x) => x.id === +b.dataset.s), m = s.months.find((x) => x.month === b.dataset.m);
+  openStatus(s, m.month, m.status);
+};
+document.querySelectorAll('.bulk').forEach((b) => b.onclick = () => bulkApply(b.dataset.st));
+$('bulkClear').onclick = () => { selected.clear(); renderRows(); };
+$('wdBody').onclick = (e) => {
+  const r = e.target.closest('.rc'); if (r) return viewReceipt(r.dataset.id);
+  const b = e.target.closest('.ew'); if (b) openWd(data.withdrawals[+b.dataset.i]);
+};
+$('wdBtn').onclick = async () => {
+  hide('wdErr');
+  const amount = $('wdAmount').value, reason = $('wdReason').value.trim(), date = $('wdDate').value;
+  if (!confirm(`Confirm withdrawal ${amount} THB\nDate: ${date}\nReason: ${reason}`)) return;
+  try {
+    const f = $('wdFile').files[0];
+    await api('/api/admin/withdraw', 'POST', { amount, reason, date, receipt: f ? await compress(f) : undefined });
+    $('wdAmount').value = ''; $('wdReason').value = ''; $('wdFile').value = ''; await refresh();
+  }
+  catch (e) { show('wdErr', e.message); }
+};
+let editingInId = null;
+$('inBody').onclick = (e) => {
+  const b = e.target.closest('.ei'); if (!b) return;
+  const x = data.incomes[+b.dataset.i]; editingInId = x.id;
+  $('eiAmount').value = x.amount; $('eiDate').value = x.date; $('eiDate').max = data.today; $('eiSource').value = x.source;
+  hide('eiErr'); $('inModal').classList.remove('hidden');
+};
+$('inBtn').onclick = async () => {
+  hide('inErr');
+  const amount = $('inAmount').value, source = $('inSource').value.trim(), date = $('inDate').value;
+  if (!confirm(`Record income ${amount} THB\nDate: ${date}\nSource: ${source}`)) return;
+  try { await api('/api/admin/income', 'POST', { amount, source, date }); $('inAmount').value = ''; $('inSource').value = ''; await refresh(); }
+  catch (e) { show('inErr', e.message); }
+};
+$('eiSave').onclick = async () => {
+  hide('eiErr');
+  try { await api('/api/admin/income/' + editingInId, 'PUT', { amount: $('eiAmount').value, date: $('eiDate').value, source: $('eiSource').value }); hide('inModal'); await refresh(); }
+  catch (e) { show('eiErr', e.message); }
+};
+$('eiDelete').onclick = async () => {
+  if (!confirm('Delete this income record? The amount will be removed from the room fund.')) return;
+  try { await api('/api/admin/income/' + editingInId, 'DELETE'); hide('inModal'); await refresh(); }
+  catch (e) { show('eiErr', e.message); }
+};
+$('eiClose').onclick = () => hide('inModal');
+$('ewSave').onclick = saveWd; $('ewDelete').onclick = delWd; $('ewClose').onclick = () => hide('wdModal');
+$('pwOpen').onclick = openPw; $('pwSave').onclick = savePw; $('pwClose').onclick = () => hide('pwModal'); $('pwUser').onchange = pwToggle;
+$('loginBtn').onclick = login;
+$('pass').onkeydown = (e) => { if (e.key === 'Enter') login(); };
+$('logout').onclick = logout;
+$('mClose').onclick = () => hide('modal');
+$('search').oninput = renderRows;
+$('pending').onclick = (e) => { const b = e.target.closest('.view'); if (b) openReview(data.pending[+b.dataset.i]); };
+if (token) refresh().catch(() => {});
+</script>
+<div id="themeSw" class="fixed bottom-4 right-4 z-[5] flex rounded-full border border-slate-300 bg-white shadow overflow-hidden text-sm" role="group" aria-label="Choose theme">
+  <button data-t="light" class="px-3 py-2" aria-label="Light" title="Light">☀</button>
+  <button data-t="dark" class="px-3 py-2" aria-label="Dark" title="Dark">☾</button>
+</div>
+<script>
+(function () {
+  var r = document.documentElement, bs = document.querySelectorAll('#themeSw button');
+  function paint() {
+    var d = r.classList.contains('dark');
+    bs.forEach(function (b) { var on = (b.dataset.t === 'dark') === d; b.className = 'px-3 py-2 ' + (on ? 'bg-emerald-600 text-white font-medium' : 'text-slate-600'); });
+  }
+  bs.forEach(function (b) {
+    b.onclick = function () { r.classList.toggle('dark', b.dataset.t === 'dark'); try { localStorage.setItem('theme', b.dataset.t); } catch (e) {} paint(); };
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

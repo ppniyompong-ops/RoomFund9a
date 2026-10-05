@@ -1,0 +1,17 @@
+{
+  "name": "classroom-fund-3-a",
+  "version": "1.0.0",
+  "description": "Class Fund 3/A - classroom fund tracker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.0"
+  }
+}
