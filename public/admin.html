@@ -315,7 +315,7 @@ function renderRows() {
 }
 async function bulkApply(status) {
   const ids = [...selected], mv = $('bulkMonth').value, months = mv === 'all' ? data.months : [mv];
-  const what = { approved: 'Paid', unpaid: 'Outstanding', none: '- (No payment required)' }[status];
+  const what = { approved: 'Paid', unpaid: 'Unpaid', none: '- (No payment required)' }[status];
   if (!confirm(`Set status to "${what}" for ${ids.length} student(s) (${mv === 'all' ? 'All months' : label(mv)})?`)) return;
   hide('bulkMsg');
   try {
